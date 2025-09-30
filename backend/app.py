@@ -20,12 +20,18 @@ PUBLIC_BASE_URL = os.getenv("PUBLIC_BASE_URL")
 NETLIFY_URL = os.getenv("NETLIFY_URL")
 LOCAL_URL = os.getenv("LOCAL_URL", "http://localhost:5000")
 
-CORS(app, supports_credentials=True, origins=["http://localhost:5173"])
+CORS(app,
+    supports_credentials=True, 
+    origins=["http://localhost:5173"],
+    allow_headers=["Content-Type", "Authorization"],
+    methods=["GET", "POST", "OPTIONS"])
+
 CORS(app, supports_credentials=True, origins=[
     f"{NETLIFY_URL}",
     f"{PUBLIC_BASE_URL}",
-    f"{LOCAL_URL}",
-])
+    f"{LOCAL_URL}",], 
+    allow_headers=["Content-Type", "Authorization"],
+    methods=["GET", "POST", "OPTIONS"])
 
 app.config.update(
     SESSION_COOKIE_SAMESITE="None",  # None for cross-site
