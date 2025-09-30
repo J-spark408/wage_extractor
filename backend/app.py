@@ -16,13 +16,15 @@ load_dotenv(find_dotenv(), override=True)
 
 app = Flask(__name__)
 
-PUBLIC_BASE_URL = os.getenv("PUBLIC_BASE_URL", "https://localhost:5000")
+PUBLIC_BASE_URL = os.getenv("PUBLIC_BASE_URL")
 NETLIFY_URL = os.getenv("NETLIFY_URL")
+LOCAL_URL = os.getenv("LOCAL_URL", "http://localhost:5000")
 
 CORS(app, supports_credentials=True, origins=["http://localhost:5173"])
 CORS(app, supports_credentials=True, origins=[
     f"{NETLIFY_URL}",
-    f"{PUBLIC_BASE_URL}"
+    f"{PUBLIC_BASE_URL}",
+    f"{LOCAL_URL}",
 ])
 
 app.config.update(
@@ -159,6 +161,8 @@ def upload_file():
         # 👇 absolute, publicly reachable URLs
         pdf_url = f"{PUBLIC_BASE_URL}/download/pdf/{pdf_rel}"
         excel_url = f"{PUBLIC_BASE_URL}/download/excel/{excel_rel}"
+        #pdf_url = f"{LOCAL_URL}/download/pdf/{pdf_rel}"
+        #excel_url = f"{LOCAL_URL}/download/excel/{excel_rel}"
 
         # Tell the frontend we're returning JSON
         return jsonify({"pdf_url": pdf_url, "excel_url": excel_url})

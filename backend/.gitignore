@@ -1,2 +1,5 @@
 accounts.json
 .env
+
+__pycache__/
+instance/
