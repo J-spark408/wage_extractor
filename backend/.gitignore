@@ -3,3 +3,7 @@ accounts.json
 
 __pycache__/
 instance/
+
+uploads/
+pdf/
+excel/
