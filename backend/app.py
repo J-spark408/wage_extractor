@@ -20,65 +20,12 @@ PUBLIC_BASE_URL = os.getenv("PUBLIC_BASE_URL")
 NETLIFY_URL = os.getenv("NETLIFY_URL")
 LOCAL_URL = os.getenv("LOCAL_URL", "http://localhost:5000")
 
-ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    NETLIFY_URL,
-    PUBLIC_BASE_URL,
-    LOCAL_URL,
-]
-
-ALLOWED_ORIGINS = [o.rstrip("/") for o in ALLOWED_ORIGINS if o]
-
-CORS(
-    app,
-    origins=ALLOWED_ORIGINS,
-    supports_credentials=True,
-    allow_headers=["Content-Type", "Authorization"],
-    methods=["GET", "POST", "OPTIONS"],
-)
-
-def is_allowed_origin(origin: str) -> bool:
-    return origin and origin.rstrip("/") in ALLOWED_ORIGINS
-
-# 2) Generic OPTIONS preflight handler (covers any route)
-@app.route("/<path:any_path>", methods=["OPTIONS"])
-def any_options(any_path):
-    # Echo requested headers for stricter browsers/proxies
-    req_headers = request.headers.get("Access-Control-Request-Headers", "Content-Type, Authorization")
-    resp = app.response_class(status=204)
-    origin = request.headers.get("Origin")
-    if is_allowed_origin(origin):
-        resp.headers["Access-Control-Allow-Origin"] = origin
-        resp.headers["Access-Control-Allow-Credentials"] = "true"
-        resp.headers["Access-Control-Allow-Methods"] = "GET,POST,OPTIONS"
-        resp.headers["Access-Control-Allow-Headers"] = req_headers
-        resp.headers["Vary"] = "Origin"
-    return resp
-
-# 3) Force headers on all responses (belt-and-suspenders)
-@app.after_request
-def add_cors_headers(resp):
-    origin = request.headers.get("Origin")
-    if is_allowed_origin(origin):
-        resp.headers["Access-Control-Allow-Origin"] = origin
-        resp.headers["Access-Control-Allow-Credentials"] = "true"
-        resp.headers["Vary"] = "Origin"
-        # If you need to read custom headers on responses:
-        resp.headers["Access-Control-Expose-Headers"] = "Content-Disposition"
-    return resp
-
-# CORS(app,
-#     supports_credentials=True, 
-#     origins=["http://localhost:5173"],
-#     allow_headers=["Content-Type", "Authorization"],
-#     methods=["GET", "POST", "OPTIONS"])
-
-# CORS(app, supports_credentials=True, origins=[
-#     f"{NETLIFY_URL}",
-#     f"{PUBLIC_BASE_URL}",
-#     f"{LOCAL_URL}",], 
-#     allow_headers=["Content-Type", "Authorization"],
-#     methods=["GET", "POST", "OPTIONS"])
+CORS(app, supports_credentials=True, origins=["http://localhost:5173"])
+CORS(app, supports_credentials=True, origins=[
+    f"{NETLIFY_URL}",
+    f"{PUBLIC_BASE_URL}",
+    f"{LOCAL_URL}",
+])
 
 app.config.update(
     SESSION_COOKIE_SAMESITE="None",  # None for cross-site
