@@ -20,35 +20,12 @@ PUBLIC_BASE_URL = os.getenv("PUBLIC_BASE_URL")
 NETLIFY_URL = os.getenv("NETLIFY_URL")
 LOCAL_URL = os.getenv("LOCAL_URL", "http://localhost:5000")
 
-def get_allowed_origins():
-    # Note: Use a set for fast lookup and to handle case where env vars might be None
-    potential_origins = {
-        NETLIFY_URL,
-        PUBLIC_BASE_URL,
-        LOCAL_URL,
-        "http://localhost:5173",
-        "https://ezwager.netlify.app", # The client origin
-    }
-    # Filter out None/empty strings and return a set of valid URL strings
-    return {url for url in potential_origins if url}
-
-def cors_origin_handler(origin, _):
-    allowed_set = get_allowed_origins()
-    # Check if the requesting origin is in our allowed set
-    if origin and origin in allowed_set:
-        # Return the exact origin string to be used for Access-Control-Allow-Origin header
-        return origin
-    # If the origin is not allowed, return False
-    return False
-
-CORS(app, supports_credentials=True, origins=cors_origin_handler)
-
-# CORS(app, supports_credentials=True, origins=[
-#     f"{NETLIFY_URL}",
-#     f"{PUBLIC_BASE_URL}",
-#     f"{LOCAL_URL}",
-#     "http://localhost:5173",
-# ])
+CORS(app, supports_credentials=True, origins=["http://localhost:5173"])
+CORS(app, supports_credentials=True, origins=[
+    f"{NETLIFY_URL}",
+    f"{PUBLIC_BASE_URL}",
+    f"{LOCAL_URL}",
+])
 
 app.config.update(
     SESSION_COOKIE_SAMESITE="None",  # None for cross-site
